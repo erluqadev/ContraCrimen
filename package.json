@@ -1,5 +1,5 @@
 {
-  "name": "Contra Crimen",
+  "name": "contracrimen",
   "version": "1.0.0",
   "description" : "App ContraCrimen",
   "author" : "Ericson Luis",
@@ -22,6 +22,6 @@
     "socket.io": "*"
   },
   "engines" : {
-    "node" : "4.2.0"
+    "node" : "*"
   }
 }
