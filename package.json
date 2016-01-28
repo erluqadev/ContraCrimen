@@ -7,19 +7,19 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "async": "^1.5.2",
-    "body-parser": "~1.13.2",
-    "connect-multiparty": "^2.0.0",
-    "cookie-parser": "~1.3.5",
-    "debug": "~2.2.0",
-    "ejs": "^2.3.4",
-    "express": "~4.13.1",
-    "express-session": "^1.12.1",
-    "mongoose": "^4.3.1",
-    "morgan": "~1.6.1",
-    "nodemailer": "^0.7.1",
-    "serve-favicon": "~2.3.0",
-    "socket.io": "^1.4.4"
+    "async": "*",
+    "body-parser": "*",
+    "connect-multiparty": "*",
+    "cookie-parser": "*",
+    "debug": "*",
+    "ejs": "*",
+    "express": "*",
+    "express-session": "*",
+    "mongoose": "*",
+    "morgan": "*",
+    "nodemailer": "*",
+    "serve-favicon": "*",
+    "socket.io": "*"
   },
   "engines" : {
     "node" : "1.8.1"
