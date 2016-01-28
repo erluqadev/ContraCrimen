@@ -6,7 +6,7 @@ console.log('CONECTANDO CON MONGODB');
 var dbName = 'contracrimen'
 
 // the application is executed on the local machine ...
-mongoose.connect('mongodb://localhost/' + dbName);
+mongoose.connect('mongodb://erluqadev:erluqadev@ds051575.mongolab.com:51575/contra_crimen');
 
 
 
