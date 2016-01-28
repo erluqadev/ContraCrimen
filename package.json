@@ -22,6 +22,6 @@
     "socket.io": "*"
   },
   "engines" : {
-    "node" : "1.8.1"
+    "node" : "4.2.0"
   }
 }
