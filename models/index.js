@@ -3,8 +3,6 @@ var models = {};
 
 console.log('CONECTANDO CON MONGODB');
 
-var dbName = 'contracrimen'
-
 // the application is executed on the local machine ...
 mongoose.connect('mongodb://erluqadev:erluqadev@ds051575.mongolab.com:51575/contra_crimen');
 
@@ -12,7 +10,7 @@ mongoose.connect('mongodb://erluqadev:erluqadev@ds051575.mongolab.com:51575/cont
 
 var getModels = function(){
 
-	var Usuario = new mongoose.Schema({
+	var Usuarios = new mongoose.Schema({
 		nombre 		: {type: String},
 		apePaterno 	: {type: String},
 		apeMaterno 	: {type: String},
@@ -32,15 +30,24 @@ var getModels = function(){
 		fechaRegistro: {type: Date}
 	});
 
-	var Grupo = new mongoose.Schema({
+	var SedesPoliciales = new mongoose.Schema({
+		nombre 			: {type: String},
+		latitud 		: {type: String},
+		longitud 		: {type: String},
+		direccion 		: {type: String},
+		departamento	: {type: String},
+		provincia		: {type: String},
+		distrito		: {type: String}
+	});
+
+	var Grupos = new mongoose.Schema({
 		nombre 		: {type: String},
 		tipo		: {type: String},
 		usuario 	: {type: mongoose.Schema.ObjectId , ref:'usuario'}
 	});
 
-	var Incidencia = new mongoose.Schema({
+	var Incidencias = new mongoose.Schema({
 		descripcion 	: {type: String},
-		modo 			: {type: String},
 		tipo 			: {type: String},
 		latitud 		: {type: String},
 		longitud 		: {type: String},
@@ -51,9 +58,28 @@ var getModels = function(){
 		usuario 		: {type: mongoose.Schema.ObjectId , ref:'usuario'}
 	});
 
-	models.Usuario = mongoose.model('usuario' , Usuario);
-	models.Grupo = mongoose.model('grupo' , Grupo);
-	models.Incidencia = mongoose.model('incidencia' , Incidencia);
+
+	var Denuncias = new mongoose.Schema({
+		descripcion 	: {type: String},
+		tipo 			: {type: String},
+		latitud 		: {type: String},
+		longitud 		: {type: String},
+		direccion 		: {type: String},
+		modoUsuario 	: {type: String},
+		evidencias		: {type: Array},
+		acusados		: {type: Array},
+		fechaRegistro	: {type: Date},
+		sedePolicial	: {type: mongoose.Schema.ObjectId , ref:'sedepolicial'},
+		usuario 		: {type: mongoose.Schema.ObjectId , ref:'usuario'}
+	});
+
+
+
+	models.Usuarios = mongoose.model('usuarios' , Usuarios);
+	models.SedesPoliciales = mongoose.model('sedespoliciales' , SedesPoliciales);
+	models.Grupos = mongoose.model('grupos' , Grupos);
+	models.Incidencias = mongoose.model('incidencias' , Incidencias);
+	models.Denuncias = mongoose.model('denuncias' , Denuncias);
 
 	return models;
 }

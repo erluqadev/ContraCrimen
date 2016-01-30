@@ -119,7 +119,6 @@ var login = function(req, res, next){
 		usuario : usuario,
 		password : password
 	};
-
 	usuarioModel.findParamsUsuarios(conditions, function(err, respJson){
 		if(err){
 			next(err);

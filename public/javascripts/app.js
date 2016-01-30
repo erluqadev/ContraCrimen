@@ -91,6 +91,9 @@ var home = function(){
 		$("#btn-show-maps").on('click',showMaps);
 		$("#btn-search-maps").on('click',searchMaps);
 		$("#btn-acept-maps").on('click',aceptarUbicacion);
+		$("#btn-registro-denuncia").on('click',function(){
+			location.href="denuncias/registro_denuncia"
+		});
 		listarGruposUsuario();
 		listarIncidencias(false);
 

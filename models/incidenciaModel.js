@@ -1,9 +1,9 @@
 
-var Incidencia;
+var Incidencias;
 
 var findAllIncidencias = function(cb){
 	console.log('findAllIncidencias');
-	Incidencia
+	Incidencias
 	.find({})
 	.populate('usuario')
 	.exec(function(err,respIncidencias){
@@ -13,7 +13,7 @@ var findAllIncidencias = function(cb){
 
 var findIncidenciasLimitOffset = function(offset, cb){
 	console.log('findIncidenciasLimitOffset');
-	Incidencia
+	Incidencias
 	.find({})
 	.sort({fechaRegistro : -1})
 	.limit(10)
@@ -27,17 +27,17 @@ var findIncidenciasLimitOffset = function(offset, cb){
 var addIncidencia = function(inc, cb){
 	console.log('addIncidencia');
 
-	var incidencia= new Incidencia(inc);
+	var incidencias= new Incidenciass(inc);
 
-	incidencia.save(function(err, respIncidencias) {
-		cb(err,respIncidencias);
+	incidencia.save(function(err, respIncidencia) {
+		cb(err,respIncidencia);
 	});
 };
 
 var updateIncidencia = function(where,inc,options,cb){
 	console.log('updateIncidencia');
 
-	Incidencia.update(where,inc,options,function(err,numAffected){
+	Incidencias.update(where,inc,options,function(err,numAffected){
 		cb(err,numAffected);
 	})
 
@@ -45,7 +45,7 @@ var updateIncidencia = function(where,inc,options,cb){
 
 
 module.exports = function(models){
-	Incidencia = models.Incidencia;
+	Incidencias = models.Incidencias;
 
 	return {
 		findAllIncidencias : findAllIncidencias,

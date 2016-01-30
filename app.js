@@ -12,6 +12,7 @@ var routes = require('./routes/index');
 var usuarios = require('./routes/usuarios')(models);
 var grupos = require('./routes/grupos')(models);
 var incidencias = require('./routes/incidencias')(models);
+var denuncias = require('./routes/denuncias')(models);
 
 var app = express();
 
@@ -38,6 +39,7 @@ app.use('/', routes);
 app.use('/usuarios', usuarios);
 app.use('/grupos',grupos);
 app.use('/incidencias',incidencias);
+app.use('/denuncias',denuncias);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   console.log('---- ERROR 404 -----');

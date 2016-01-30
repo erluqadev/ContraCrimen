@@ -1,10 +1,10 @@
 
-var Usuario;
+var Usuarios;
 
 var findAllUsuarios = function(cb){
 	console.log('findAllUsuarios')
 
-	Usuario.find(function(err, respUsuarios) {
+	Usuarios.find(function(err, respUsuarios) {
 	    cb(err,respUsuarios);
 	});
 };
@@ -12,7 +12,7 @@ var findAllUsuarios = function(cb){
 var findParamsUsuarios =  function(params,cb){
 	console.log('findParamsUsuarios');
 
-	Usuario.findOne(params,function(err, respUsuarios) {
+	Usuarios.findOne(params,function(err, respUsuarios) {
 	    cb(err,respUsuarios);
 	});
 };
@@ -21,7 +21,7 @@ var findParamsUsuarios =  function(params,cb){
 var findUsuarioById=function(id, cb){
 	console.log('findUsuarioById:' + id);
 
-	Usuario.findById(id, function(err, respUsuario) {
+	Usuarios.findById(id, function(err, respUsuario) {
 		cb(err,respUsuario);
 	});
 };
@@ -30,9 +30,9 @@ var findUsuarioById=function(id, cb){
 var addUsuario = function(usu, cb){
 	console.log('addUsuario');
 
-	var usuario= new Usuario(usu);
+	var usuarios= new Usuarios(usu);
 
-	usuario.save(function(err, respUsuario) {
+	usuarios.save(function(err, respUsuario) {
 		cb(err,respUsuario);
 	});
 };
@@ -41,20 +41,18 @@ var addUsuario = function(usu, cb){
 var updateUsuario = function(conditions, usu, cb){
 	console.log('updateUsuario');
 
-	Usuario.update(conditions,usu,function(err,respUsuario){
+	Usuarios.update(conditions,usu,function(err,respUsuario){
 		cb(err,respUsuario);
 	});
 };
 
 
 module.exports = function(models){
-	Usuario = models.Usuario;
+	Usuarios = models.Usuarios;
 
 	return {
 		findAllUsuarios : findAllUsuarios,
 		findUsuarioById : findUsuarioById,
-		addUsuario : addUsuario,
-		updateUsuario : updateUsuario,
 		findParamsUsuarios : findParamsUsuarios
 	};
 };

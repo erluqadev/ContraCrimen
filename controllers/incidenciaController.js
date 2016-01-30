@@ -72,7 +72,6 @@ var addIncidencia = function(req, res, next){
 	if(typeof req.session.usuario !== 'undefined'){
 		var inc = {
 			descripcion 	: req.body.descripcion,
-			modo 			: 'P',
 			tipo 			: req.body.tipo,
 			latitud 		: req.body.lat,
 			longitud 		: req.body.lng,
@@ -105,9 +104,6 @@ var addIncidencia = function(req, res, next){
 			res.status(200).redirect('/');
 		}
 	}
-
-
-	
 };
 
 var uploadEvidencias = function(req, res, next){
