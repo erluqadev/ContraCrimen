@@ -30,6 +30,9 @@ var getIncidencias = function(req, res, next){
 };
 
 var getIncidenciasLimitOffset = function(req, res, next){
+	console.log('==================');
+	console.log('esta por aqui');
+	console.log('==================');
 	if(typeof req.session.usuario !== 'undefined'){
 		var offset=0;
 		if(req.body.masResultados){
@@ -69,6 +72,8 @@ var getIncidenciasLimitOffset = function(req, res, next){
 //HTTP:POST /incidencias/registrar
 var addIncidencia = function(req, res, next){
 
+	console.log('kjalkjk');
+
 	if(typeof req.session.usuario !== 'undefined'){
 		var inc = {
 			descripcion 	: req.body.descripcion,
@@ -79,7 +84,7 @@ var addIncidencia = function(req, res, next){
 			modoUsuario 	: req.body.modoUsuario,
 			fechaRegistro	: new Date(),
 			evidencias		: [],
-			usuario 		: req.session.usuario
+			usuario 		: req.session.usuario._id
 		};
 
 		incidenciaModel.addIncidencia(inc, function(err, respJson){

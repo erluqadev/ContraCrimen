@@ -67,6 +67,8 @@ var getUsuarioById = function(req, res, next){
 //HTTP:POST /usuarios
 var addUsuario = function(req, res, next){
 
+	console.log('por aqui');
+
 	var UUID = generarUUID();
 
 	var usu = {

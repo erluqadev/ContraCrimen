@@ -53,6 +53,8 @@ module.exports = function(models){
 	return {
 		findAllUsuarios : findAllUsuarios,
 		findUsuarioById : findUsuarioById,
-		findParamsUsuarios : findParamsUsuarios
+		findParamsUsuarios : findParamsUsuarios,
+		addUsuario : addUsuario,
+		updateUsuario : updateUsuario
 	};
 };

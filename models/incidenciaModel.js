@@ -20,6 +20,8 @@ var findIncidenciasLimitOffset = function(offset, cb){
 	.skip(offset)
 	.populate('usuario')
 	.exec(function(err, respIncidencias){
+		console.log('LISTANDO INCIDENCIAS');
+		console.log(respIncidencias);
 		cb(err,respIncidencias);
 	});
 };
@@ -27,9 +29,9 @@ var findIncidenciasLimitOffset = function(offset, cb){
 var addIncidencia = function(inc, cb){
 	console.log('addIncidencia');
 
-	var incidencias= new Incidenciass(inc);
+	var incidencias= new Incidencias(inc);
 
-	incidencia.save(function(err, respIncidencia) {
+	incidencias.save(function(err, respIncidencia) {
 		cb(err,respIncidencia);
 	});
 };

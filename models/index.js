@@ -5,6 +5,7 @@ console.log('CONECTANDO CON MONGODB');
 
 // the application is executed on the local machine ...
 mongoose.connect('mongodb://erluqadev:erluqadev@ds051575.mongolab.com:51575/contra_crimen');
+//mongoose.connect('mongodb://localhost/contra_crimen');
 
 
 
@@ -43,7 +44,7 @@ var getModels = function(){
 	var Grupos = new mongoose.Schema({
 		nombre 		: {type: String},
 		tipo		: {type: String},
-		usuario 	: {type: mongoose.Schema.ObjectId , ref:'usuario'}
+		usuario 	: {type: mongoose.Schema.ObjectId , ref:'Usuarios'}
 	});
 
 	var Incidencias = new mongoose.Schema({
@@ -55,7 +56,7 @@ var getModels = function(){
 		modoUsuario 	: {type: String},
 		evidencias		: {type: Array},
 		fechaRegistro	: {type: Date},
-		usuario 		: {type: mongoose.Schema.ObjectId , ref:'usuario'}
+		usuario 		: {type: mongoose.Schema.ObjectId , ref:'Usuarios'}
 	});
 
 
@@ -69,17 +70,17 @@ var getModels = function(){
 		evidencias		: {type: Array},
 		acusados		: {type: Array},
 		fechaRegistro	: {type: Date},
-		sedePolicial	: {type: mongoose.Schema.ObjectId , ref:'sedepolicial'},
-		usuario 		: {type: mongoose.Schema.ObjectId , ref:'usuario'}
+		sedePolicial	: {type: mongoose.Schema.ObjectId , ref:'Sedespoliciales'},
+		usuario 		: {type: mongoose.Schema.ObjectId , ref:'Usuarios'}
 	});
 
 
 
-	models.Usuarios = mongoose.model('usuarios' , Usuarios);
-	models.SedesPoliciales = mongoose.model('sedespoliciales' , SedesPoliciales);
-	models.Grupos = mongoose.model('grupos' , Grupos);
-	models.Incidencias = mongoose.model('incidencias' , Incidencias);
-	models.Denuncias = mongoose.model('denuncias' , Denuncias);
+	models.Usuarios = mongoose.model('Usuarios' , Usuarios);
+	models.SedesPoliciales = mongoose.model('Sedespoliciales' , SedesPoliciales);
+	models.Grupos = mongoose.model('Grupos' , Grupos);
+	models.Incidencias = mongoose.model('Incidencias' , Incidencias);
+	models.Denuncias = mongoose.model('Denuncias' , Denuncias);
 
 	return models;
 }

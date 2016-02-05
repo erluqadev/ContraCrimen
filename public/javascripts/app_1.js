@@ -57,8 +57,11 @@ var index = function(){
 var home = function(){
 
 	var archivos = [];
-	var _ubicacion = {};
-	
+	var map = null;
+    var infowindow = new google.maps.InfoWindow;
+    var marcador = null;
+    var geocoder = new google.maps.Geocoder;
+    var ubicacion = {};
     var socket = io();
 
 	var init = function(){
@@ -85,27 +88,189 @@ var home = function(){
 		$("input[name=files-evidencias]").on('change',previewFoto);
 		$("#btn-publicar").on('click',publicarIncidencia);
 		$("#select-modoUsuario a").on('click',changeModoUsuario);
-		
+		$("#btn-show-maps").on('click',showMaps);
+		$("#btn-search-maps").on('click',searchMaps);
+		$("#btn-acept-maps").on('click',aceptarUbicacion);
 		$("#btn-registro-denuncia").on('click',function(){
 			location.href="denuncias/registro_denuncia"
 		});
-
-		var content = document.getElementById("maps_content");
-		var search = document.getElementById("maps_search");
-		mapsSearch({content : content , search : search}, function(err, ubicacion){
-			if(err) alert(err);
-			_ubicacion = ubicacion;
-			$("#lbl-ubicacion").text(ubicacion.direccion);
-			$("#modal_maps").modal('hide');
-		});
-
 		listarGruposUsuario();
 		listarIncidencias(false);
 
 		socket.on('nueva incidencia' , showIncidencia);
 	};
 
-	
+	var showMaps = function(){
+		/* Si se puede obtener la localización */
+            if (navigator.geolocation)
+            {
+                navigator.geolocation.getCurrentPosition(loadMapa,error_maps);
+            }
+            /* Si el navegador no soporta la recuperación de la geolocalización */
+            else
+            {
+                alert('¡Oops! Tu navegador no soporta geolocalización.');
+            }
+	};
+
+	var loadMapa = function(pos)
+	{
+	    /* Obtenemos los parámetros de la API de geolocalización HTML*/
+	    var latitud = pos.coords.latitude;
+	    var longitud = pos.coords.longitude;
+	    var precision = pos.coords.accuracy;
+
+	    /* A través del DOM obtenemos el div que va a contener el mapa */
+	    var contenedor = document.getElementById("maps_div");
+
+	    /* Posicionamos un punto en el mapa con las coordenadas que nos ha proporcionado la API*/
+	    var centro = new google.maps.LatLng(latitud,longitud);
+
+	    /* Definimos las propiedades del mapa */
+	    var propiedades =
+	    {
+	        zoom: 15,
+	        center: centro,
+	        mapTypeId: google.maps.MapTypeId.ROADMAP
+	    };
+
+	    map = new google.maps.Map(contenedor, propiedades);
+	    infoWindow = new google.maps.InfoWindow();
+
+	    /* Un servicio que proporciona la API de GM es colocar marcadores sobre el mapa */
+	    marcador = new google.maps.Marker({
+	        position: centro,
+	        map: map,
+	        draggable:true,
+	        title: "Tu localizacion",
+	        animation: google.maps.Animation.DROP
+	    });
+
+	    geocoderLatLng();
+
+	    google.maps.event.addListener(marcador, 'mouseover', function(){
+	        openInfoWindow();
+	        google.maps.event.addListener(marcador, 'mouseout', function(){
+	            infowindow.close();
+	        });
+	    });
+
+	    google.maps.event.addListener(marcador, 'mouseup',mouseUpMark);
+
+	    google.maps.event.addListener(map, 'click', clickMap);
+	};
+
+	var mouseUpMark =  function(){
+		console.log('mouseupmark');
+	    geocoderLatLng();
+	};
+
+	var clickMap = function(e){
+		console.log('click');
+		var latlng = e.latLng;
+		marcador.setPosition(latlng);
+	    geocoderLatLng();
+	};
+
+	var geocoderLatLng = function(){
+		var latlng = marcador.getPosition();
+	    geocoder.geocode({'location': latlng}, function(results, status) {
+	        if (status === google.maps.GeocoderStatus.OK) {
+	          	if (results[0]) {
+	          		ubicación = {
+	          			lat : latlng.lat,
+	          			lng : latlng.lng,
+	          			direccion : results[0].formatted_address
+	          		}
+	          	} 
+	          	else {
+	            	window.alert('No results found');
+	          	}
+	        } else {
+	          window.alert('Geocoder failed due to: ' + status);
+	        }
+      	});
+	}
+
+	var openInfoWindow=function() {
+		console.log('marcador');
+	    var latlng = marcador.getPosition();
+    	var content = '<div>';
+    	content = content + '<div><strong>' + ubicación.direccion + '</strong></div>';
+    	content = content + '<div>Latitud : ' + latlng.lat() + '</div>';
+    	content = content + '<div>Longitud : ' + latlng.lng() + '</div>';
+    	content = content + '</div>';
+	    infowindow.setContent(content);
+	    infowindow.open(map, marcador);
+	};
+
+	var searchMaps = function(){
+		var address = $('#input-search-maps').val();
+	    // Creamos el Objeto Geocoder
+	    var geocoder = new google.maps.Geocoder();
+	    // Hacemos la petición indicando la dirección e invocamos la función
+	    // geocodeResult enviando todo el resultado obtenido
+	    geocoder.geocode({ 'address': address}, geocodeResult);
+	};
+
+	var geocodeResult = function(results, status) {
+	    // Verificamos el estatus
+	    if (status == 'OK') {
+	        // Si hay resultados encontrados, centramos y repintamos el mapa
+	        // esto para eliminar cualquier pin antes puesto
+	        var mapOptions = {
+	            center: results[0].geometry.location,
+	            mapTypeId: google.maps.MapTypeId.ROADMAP
+	        };
+	        map = new google.maps.Map($("#maps_div").get(0), mapOptions);
+	        // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
+	        map.fitBounds(results[0].geometry.viewport);
+	        // Dibujamos un marcador con la ubicación del primer resultado obtenido
+	        var markerOptions = { 
+	        	position: results[0].geometry.location,
+	        	map: map,
+		        draggable:true,
+		        title: "Tu localizacion",
+		        animation: google.maps.Animation.DROP
+	        };
+	        marcador = new google.maps.Marker(markerOptions);
+
+	        geocoderLatLng();
+
+    	    google.maps.event.addListener(marcador, 'mouseover', function(){
+    	        openInfoWindow();
+    	        google.maps.event.addListener(marcador, 'mouseout', function(){
+    	            infowindow.close();
+    	        });
+    	    });
+
+    	    google.maps.event.addListener(marcador, 'mouseup',mouseUpMark);
+
+    	    google.maps.event.addListener(map, 'click', clickMap);
+	    } else {
+	        // En caso de no haber resultados o que haya ocurrido un error
+	        // lanzamos un mensaje con el error
+	        alert("Geocoding no tuvo éxito debido a: " + status);
+	    }
+	};
+
+	/* Gestion de errores */
+	var error_maps = function(errorCode)
+	{
+	    if(errorCode.code == 1)
+	        alert("No has permitido buscar tu localizacion")
+	    else if (errorCode.code==2)
+	        alert("Posicion no disponible");
+	    else
+	        alert("Ha ocurrido un error");
+	};
+
+	var aceptarUbicacion = function(){
+	    $("#lbl-ubicacion").text(ubicación.direccion);
+	    $("#modal_maps").modal('hide');
+	};
+
+
 	var registroGrupo = function(e){
 		e.preventDefault();
 		$.ajax({
@@ -207,7 +372,7 @@ var home = function(){
 		$.ajax({
 			type:'POST',
 			url:'incidencias/publicar',
-			data:{'descripcion':descripcion,'tipo':tipo,'modoUsuario':modoUsuario,'lat':_ubicacion.lat,'lng':_ubicacion.lng,'direccion':_ubicacion.direccion},
+			data:{'descripcion':descripcion,'tipo':tipo,'modoUsuario':modoUsuario,'lat':ubicación.lat,'lng':ubicación.lng,'direccion':ubicación.direccion},
 			dataType:'json',
 			success:function(respJson){
 				if(respJson!=null){
@@ -315,208 +480,6 @@ var home = function(){
 		$(cloneTemplate).css('display','block');
 	};
 
-
-	init();
-
-};
-
-
-var mapsSearch = function(options , callback){
-	var _map = null;
-    var _infowindow = null;
-    var _marcador = null;
-    var _geocoder = null;
-    var _ubicacion = {};
-	var _content,_search;
-	if(options){
-		_content = options.content;
-		_search = options.search;
-	}
-	else{
-		_content = $("#maps_div");
-		_search = $("#maps_search");
-	}
-	if(!(_content && _search)){
-		throw new Error("Debe existir el contenedor del mapa y el buscador del mapa." );
-	}
-
-	var showMaps = function(){
-		/* Si se puede obtener la localización */
-            if (navigator.geolocation)
-            {
-                navigator.geolocation.getCurrentPosition(loadMapa,error_maps);
-            }
-            /* Si el navegador no soporta la recuperación de la geolocalización */
-            else
-            {
-                alert('¡Oops! Tu navegador no soporta geolocalización.');
-            }
-	};
-
-	var loadMapa = function(pos)
-	{
-	    /* Obtenemos los parámetros de la API de geolocalización HTML*/
-	    var latitud = pos.coords.latitude;
-	    var longitud = pos.coords.longitude;
-	    var precision = pos.coords.accuracy;
-
-
-	    /* Posicionamos un punto en el mapa con las coordenadas que nos ha proporcionado la API*/
-	    var centro = new google.maps.LatLng(latitud,longitud);
-
-	    /* Definimos las propiedades del mapa */
-	    var propiedades =
-	    {
-	        zoom: 15,
-	        center: centro,
-	        mapTypeId: google.maps.MapTypeId.ROADMAP
-	    };
-
-	    _geocoder =  new google.maps.Geocoder();
-	    _map = new google.maps.Map(_content, propiedades);
-	    _infowindow = new google.maps.InfoWindow();
-
-	    /* Un servicio que proporciona la API de GM es colocar marcadores sobre el mapa */
-	    _marcador = new google.maps.Marker({
-	        position: centro,
-	        map: _map,
-	        draggable:true,
-	        title: "Tu localizacion",
-	        animation: google.maps.Animation.DROP
-	    });
-
-	    geocoderLatLng();
-
-	    google.maps.event.addListener(_marcador, 'mouseover', function(){
-	        openInfoWindow();
-	        google.maps.event.addListener(_marcador, 'mouseout', function(){
-	            _infowindow.close();
-	        });
-	    });
-
-	    google.maps.event.addListener(_marcador, 'mouseup',mouseUpMark);
-
-	    google.maps.event.addListener(_map, 'click', clickMap);
-	};
-
-	var mouseUpMark =  function(){
-		console.log('mouseupmark');
-	    geocoderLatLng();
-	};
-
-	var clickMap = function(e){
-		var latlng = e.latLng;
-		_marcador.setPosition(latlng);
-	    geocoderLatLng();
-	};
-
-	var geocoderLatLng = function(){
-		var latlng = _marcador.getPosition();
-	    _geocoder.geocode({'location': latlng}, function(results, status) {
-	        if (status === google.maps.GeocoderStatus.OK) {
-	          	if (results[0]) {
-	          		_ubicación = {
-	          			lat : latlng.lat,
-	          			lng : latlng.lng,
-	          			direccion : results[0].formatted_address
-	          		}
-	          	} 
-	          	else {
-	            	window.alert('No results found');
-	          	}
-	        } else {
-	          window.alert('Geocoder failed due to: ' + status);
-	        }
-      	});
-	}
-
-	var openInfoWindow=function() {
-	    var latlng = _marcador.getPosition();
-    	var content = '<div>';
-    	content = content + '<div><strong>' + _ubicación.direccion + '</strong></div>';
-    	content = content + '<div>Latitud : ' + latlng.lat() + '</div>';
-    	content = content + '<div>Longitud : ' + latlng.lng() + '</div>';
-    	content = content + '</div>';
-	    _infowindow.setContent(content);
-	    _infowindow.open(_map, _marcador);
-	};
-
-	var searchMaps = function(){
-		var address = $(_search).val();
-	    // Hacemos la petición indicando la dirección e invocamos la función
-	    // geocodeResult enviando todo el resultado obtenido
-	    _geocoder.geocode({ 'address': address}, geocodeResult);
-	};
-
-	var geocodeResult = function(results, status) {
-	    // Verificamos el estatus
-	    if (status == 'OK') {
-	        // Si hay resultados encontrados, centramos y repintamos el mapa
-	        // esto para eliminar cualquier pin antes puesto
-	        var mapOptions = {
-	            center: results[0].geometry.location,
-	            mapTypeId: google.maps.MapTypeId.ROADMAP
-	        };
-	        _map = new google.maps.Map($(_content).get(0), mapOptions);
-	        // fitBounds acercará el mapa con el zoom adecuado de acuerdo a lo buscado
-	        _map.fitBounds(results[0].geometry.viewport);
-	        // Dibujamos un marcador con la ubicación del primer resultado obtenido
-	        var markerOptions = { 
-	        	position: results[0].geometry.location,
-	        	map: _map,
-		        draggable:true,
-		        title: "Tu localizacion",
-		        animation: google.maps.Animation.DROP
-	        };
-	        _marcador = new google.maps.Marker(markerOptions);
-
-	        geocoderLatLng();
-
-    	    google.maps.event.addListener(_marcador, 'mouseover', function(){
-    	        openInfoWindow();
-    	        google.maps.event.addListener(_marcador, 'mouseout', function(){
-    	            _infowindow.close();
-    	        });
-    	    });
-
-    	    google.maps.event.addListener(_marcador, 'mouseup',mouseUpMark);
-
-    	    google.maps.event.addListener(_map, 'click', clickMap);
-	    } else {
-	        // En caso de no haber resultados o que haya ocurrido un error
-	        // lanzamos un mensaje con el error
-	        callback("Geocoding no tuvo éxito debido a: " + status);
-	    }
-	};
-
-	/* Gestion de errores */
-	var error_maps = function(errorCode)
-	{
-	    if(errorCode.code == 1)
-	        callback("No has permitido buscar tu localizacion");
-	    else if (errorCode.code==2)
-	        callback("Posicion no disponible");
-	    else
-	        callback("Ha ocurrido un error");
-	};
-
-	var aceptarUbicacion =  function(){
-		callback(false, _ubicación);
-	};
-
-
-	var init = function(){
-		var data = $(_content).data();
-		var btn_show_maps = $(data['target_show']);
-		var btn_search_maps = $(data['target_search']);
-		var btn_acept_maps = $(data['target_acept']);
-		console.log(btn_show_maps);
-		console.log(btn_search_maps);
-		console.log(btn_acept_maps);
-		$(btn_show_maps).on('click',showMaps);
-		$(btn_search_maps).on('click',searchMaps);
-		$(btn_acept_maps).on('click',aceptarUbicacion);
-	};
 
 	init();
 
